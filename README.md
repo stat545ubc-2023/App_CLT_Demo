@@ -2,9 +2,11 @@
 
 ***
 
-#### Recently learnt of Central Limit Theorem and want to see it in action?
+#### Recently learnt of the Central Limit Theorem and want to see it in action?
 
 #### You can choose the starting distribution and the sample size. The app will then generate the appropriate samples, calculate the sample means, and plot them.
+
+The app is available here: [https://ngthu003.shinyapps.io/App_CLT_Demo/](https://ngthu003.shinyapps.io/App_CLT_Demo/).
 
 ***
 
