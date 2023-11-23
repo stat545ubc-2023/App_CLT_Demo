@@ -1,8 +1,9 @@
 #' @title App to Demo Central Limit Theorem
 #' @author Thu Nguyen
+#' 
 #' @description
-#' This app lets the users to experience Central Limit Theorem.
-#' The users can choose from a few starting distribution and a sample size.
+#' This app lets the users experience the Central Limit Theorem.
+#' The users can choose from a few starting distributions and a sample size.
 #' The app will then generate an appropriate sample based on users' choices.
 #' The app provides a few plots.
 #' 1st plot shows values from a single sample.
@@ -60,7 +61,7 @@ ui <- fluidPage(
 
     # Application title
     titlePanel('Central Limit Theorem Demos'),
-    h4('Recently learnt of Central Limit Theorem and want to see it in action?'),
+    h4('Recently learnt of the Central Limit Theorem and want to see it in action?'),
     h4('You can choose the starting distribution and the sample size. The app will then generate the appropriate samples, calculate the sample means, and plot them.'),
     h4('Besides sample means, other sample statistics such as min, median, and max are also computed and plotted for comparison.'),
     p('Options for the starting distribution include normal N(0,1), exponential Exp(1), Poisson Pois(1), Geometric Geom(.5), and Binomial Bino(.5).'),
