@@ -10,6 +10,8 @@
 #' 2nd plot shows the sample means, and illustrates the CLT.
 #' 3rd plot shows other sample statistics for comparison.
 #' 4th tab shows the data and allows for downloading the data.
+#' 5th tab displays a video explaining the CLT.
+#' 6th tab provides a custom example of the CLT.
 #' 
 
 library(shiny)
@@ -52,58 +54,110 @@ fn.compute.sample.statistics <- function(dat) {
   return(dat.summary)
 }
 
+# fn to print output of CLT example
+fn.print.CLT.eg <- function(mean, sd, n) {
+  paste0(
+    'By the Central Limit Theorem, the sample mean approximately follows a normal distribution with the mean of ', 
+    mean, 
+    ' and the standard deviation of ', 
+    sd, '/sqrt(', n, ')', 
+    ' = ', round(sd/sqrt(n), 3)
+  )
+}
 
 
 # 3) Shiny App ----------------------------------------------------------------
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-
-    # Application title
-    titlePanel('Central Limit Theorem Demos'),
-    h4('Recently learnt of the Central Limit Theorem and want to see it in action?'),
-    h4('You can choose the starting distribution and the sample size. The app will then generate the appropriate samples, calculate the sample means, and plot them.'),
-    h4('Besides sample means, other sample statistics such as min, median, and max are also computed and plotted for comparison.'),
-    p('Options for the starting distribution include normal N(0,1), exponential Exp(1), Poisson Pois(1), Geometric Geom(.5), and Binomial Bino(.5).'),
-    p('How to use this demo:'),
-    p('Step 1: Choose the starting distribution.'),
-    p('Step 2: Choose the sample size n.'),
-    p('1,000 samples each of size n will be generated from the chosen distribution.'),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-          selectInput('distribution', 'Select distribution:',
-                      choices = distn.list, selected = 'Normal'),
-          sliderInput('sample.size', 'Select sample size, n,:',
-                        min = 1, max = 500, value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-          tabsetPanel(type = 'tabs',
-                      tabPanel('Draw from 1st sample',
-                               plotOutput('sample.draw')),
-                      tabPanel('Sample means',
-                               plotOutput('sample.means')),
-                      tabPanel('Other sample statistics',
-                               plotOutput('other.sample.statistics')),
-                      tabPanel('Sample summary',
-                               dataTableOutput('sample.summary.table'),
-                               downloadButton('download.samples', 'Download Samples'),
-                               downloadButton('download.sample.statistics', 'Download Sample Statistics'))
-          )
-        )
+  
+  # Application title
+  titlePanel('Central Limit Theorem Demos'),
+  tags$hr(),
+  h4('Recently learnt of the Central Limit Theorem and want to see it in action?'),
+  tags$hr(),
+  tags$div(
+    tags$p('
+           You can choose the starting distribution and the sample size. 
+           The app will then generate the appropriate samples, calculate the sample means, and plot them.
+           Besides sample means, other sample statistics such as min, median, and max are also computed and plotted for comparison.
+           ')
+  ),
+  tags$p('Options for the starting distribution include Normal, N(0,1), Exponential, Exp(1), Poisson, Poisson(1), Geometric, Geom(.5), and Binomial, Bino(.5).'),
+  tags$hr(),
+  # 
+  p('How to use this demo:'),
+  tags$ol(
+    tags$li('Choose the starting distribution'), 
+    tags$li('Choose the sample size n')
+  ),
+  p('1,000 samples each of size n will be generated from the chosen distribution.'),
+  tags$hr(),
+  
+  
+  # Sidebar with a slider input for number of bins 
+  sidebarLayout(
+    sidebarPanel(
+      selectInput('distribution', 'Select distribution:',
+                  choices = distn.list, selected = 'Normal'),
+      sliderInput('sample.size', 'Select sample size, n,:',
+                  min = 1, max = 500, value = 30),
+      #Wait until action button is clicked
+      actionButton(
+        inputId = "btn_Update",
+        label = "Update")
+    ),
+    
+    # Show a plot of the generated distribution
+    mainPanel(
+      tabsetPanel(type = 'tabs',
+                  tabPanel('Draws from 1st sample',
+                           plotOutput('sample.draw')),
+                  tabPanel('Sample means',
+                           plotOutput('sample.means')),
+                  tabPanel('Other sample statistics',
+                           plotOutput('other.sample.statistics')),
+                  tabPanel('Sample summary',
+                           dataTableOutput('sample.summary.table'),
+                           downloadButton('download.samples', 'Download Samples'),
+                           downloadButton('download.sample.statistics', 'Download Sample Statistics')),
+                  tabPanel('Learn about the CLT',
+                           tags$div(
+                            tags$p('
+                             Never heard of the Central Limit Theorem before? 
+                             Or want to refresh your memory of the Central Limit Theorem?
+                             This 3Blue1Brown explains the Central Limit Theorem and its intuition.
+                             '),
+                            tags$hr(),
+                            tags$iframe(width = '100%', height = '400', frameborder = '0', src='https://www.youtube.com/embed/zeJD6dqJ5lo?si=f8KVAuSvWOXgXdQ_', allowfullscreen = TRUE))
+                  ),
+                  tabPanel('Apply the CLT',
+                           h4('Want to see how the CLT is applied?'),
+                           p('Think of a distribution, any distribution. Without giving me the distribution, what are the mean and standard deviation of your distribution?'),
+                           sliderInput('eg.Mean', 'Distribution mean:',
+                                       min = 1, max = 500, value = 50),
+                           sliderInput('eg.SD', 'Distribution standard deviation:',
+                                       min = 1, max = 500, value = 50),
+                           p('Great! Now imagine drawing a sample of size n:'),
+                           sliderInput('eg.Sample.Size', 'Sample Size:',
+                                       min = 1, max = 500, value = 50),
+                           p('Without knowing your distribution, the Central Limit Theorem can still model the sample mean. Click the Run button below to find out.'),
+                           actionButton(
+                             inputId = "btn_eg.Update",
+                             label = "Run CLT"),
+                           tags$hr(),
+                           p(textOutput('eg.Output', container = span))
+                  )
+      )
     )
+  )
 )
 
 # Define server logic required to draw a histogram
-server <- function(input, output) {
+server <- function(input, output, session) {
   
-  # Generate Data -----------------------------------------
-  
-  # Generate samples as chosen by user
-  dat <- reactive({
+  # Generate Data, only on Update Button Click ------------
+  dat <- eventReactive(input$btn_Update, {
     fn.generate.sample(input$distribution, input$sample.size)
   })
   
@@ -173,6 +227,15 @@ server <- function(input, output) {
       write.csv(dat.summary(), file)
     }
   )
+  
+  # Apply CLT: Update Text --------------------------------
+  eg.CLT <- eventReactive(input$btn_eg.Update, {
+    fn.print.CLT.eg(input$eg.Mean, input$eg.SD, input$eg.Sample.Size)
+  })
+  
+  output$eg.Output <- renderText({
+    eg.CLT()
+  })
   
 }
 

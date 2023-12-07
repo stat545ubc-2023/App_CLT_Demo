@@ -1,0 +1,12 @@
+name: App_CLT_Demo_v2
+title: App_CLT_Demo_v2
+username: ngthu003
+account: ngthu003
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 10740631
+bundleId: 8018658
+url: https://ngthu003.shinyapps.io/App_CLT_Demo_v2/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
